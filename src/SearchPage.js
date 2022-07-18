@@ -2,7 +2,7 @@ import React from "react";
 import "./SearchPage.css";
 import { useStateValue } from "./StateProvider";
 import useGoogleSearch from "./useGoogleSearch";
-import Response from "./response";
+// import Response from "./response";
 import { Link } from "react-router-dom";
 import Search from "./Search";
 import SearchIcon from "@mui/icons-material/Search";
@@ -15,9 +15,10 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const SearchPage = () => {
   const [{ term }, dispatch] = useStateValue();
-  //   const { data } = useGoogleSearch(term);
+  const { data } = useGoogleSearch(term);
 
-  const data = Response;
+  // Mock API call 
+  // const data = Response;
 
   console.log(data);
   return (
@@ -60,17 +61,54 @@ const SearchPage = () => {
                 <MoreVertIcon />
                 <Link to="/more">more</Link>
               </div>
-              
             </div>
 
             <div className="searchPage_optionsRight">
-
+              <div className="searchPage_option">
+                <Link to='/settings'>Settings</Link>
+              </div>
+              <div className="searchPage_option">
+                <Link to='/tools'>Tools</Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="searchPage_results"></div>
+      {term && (
+        <div className="searchPage_results">
+          <p
+            className='searchPage_resultCount'>
+            About {data?.searchInformation.formattedTotalResults} results
+            ({data?.searchInformation.formattedSearchTime} seconds)
+            for {term}
+          </p>
+
+          {data?.items.map(item => (
+            <div className="searchPage_result">
+              <a className='searchPage_resultLink' href={item.link}>
+
+                {item.pagemap?.cse_image?.length > 0
+                  && item.pagemap?.cse_image[0]?.src && (
+
+                    <img src={item.pagemap?.cse_image?.length > 0
+                      && item.pagemap?.cse_image[0]?.src}
+                      className='searchPage_resultImage'
+                      alt="" />
+
+                  )}
+                {item.displayLink}
+              </a>
+              <a href={item.link} className='searchPage_resultTitle'>
+                <h2>{item.title}</h2>
+              </a>
+              <p className="searchPage_resultSnippet">
+                {item.snippet}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
